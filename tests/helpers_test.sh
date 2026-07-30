@@ -50,4 +50,25 @@ done
 
 cd - >/dev/null
 
+assert_label() {
+  local expected=$1 name=$2 mode=${3:-compact} max_length=${4:-32} actual
+  actual=$(worktrunk_format_label "$name" "$mode" "$max_length")
+  if [[ $actual != "$expected" ]]; then
+    printf 'expected label %q, got %q\n' "$expected" "$actual" >&2
+    exit 1
+  fi
+}
+
+assert_label \
+  'TASK-618 · standardize data…' \
+  'TASK-618/standardize-data-grids-and-migrate-to-new-table'
+assert_label 'TASK-618' 'TASK-618/standardize-data-grids' ticket
+assert_label \
+  'TASK-618/standardize-data-grids' \
+  'TASK-618/standardize-data-grids' \
+  branch
+assert_label 'breadcrumbs missing' 'breadcrumbs-missing'
+assert_label 'feature · concise name' 'feature/concise-name'
+assert_label 'averyverylo…' 'averyverylongunbrokenname' compact 12
+
 printf 'helpers tests passed\n'

@@ -1,8 +1,8 @@
-id = "worktrunk"
-name = "Worktrunk"
-version = "0.1.0"
+id = "worktrunk-labels"
+name = "Worktrunk Labels"
+version = "0.2.0"
 min_herdr_version = "0.7.0"
-description = "Switch, create, or remove git worktrees via worktrunk"
+description = "Switch, create, or remove git worktrees with readable workspace labels"
 platforms = ["macos", "linux"]
 
 # Workspace actions: open the picker in a split pane. Plugin panes default their cwd to

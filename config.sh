@@ -60,3 +60,46 @@ worktrunk_open_mode() {
       ;;
   esac
 }
+
+# Print the workspace-label strategy. The customized plugin defaults to a
+# compact, human-readable label while retaining the upstream branch-name
+# behavior as an explicit option.
+worktrunk_label_mode() {
+  local mode
+
+  mode=$(worktrunk_config_value label_mode)
+
+  case "$mode" in
+    ""|compact)
+      printf '%s\n' compact
+      ;;
+    branch|ticket)
+      printf '%s\n' "$mode"
+      ;;
+    *)
+      printf '\033[33mWarning:\033[0m unsupported label_mode %q; using compact\n' "$mode" >&2
+      printf '%s\n' compact
+      ;;
+  esac
+}
+
+# Print the maximum compact-label length. A value from 12 through 120 keeps the
+# result useful while preventing accidental sidebar-filling labels.
+worktrunk_label_max_length() {
+  local value
+
+  value=$(worktrunk_config_value label_max_length)
+
+  if [[ -z $value ]]; then
+    printf '%s\n' 32
+    return
+  fi
+
+  if [[ $value =~ ^[0-9]+$ ]] && (( 10#$value >= 12 && 10#$value <= 120 )); then
+    printf '%s\n' "$((10#$value))"
+    return
+  fi
+
+  printf '\033[33mWarning:\033[0m unsupported label_max_length %q; using 32\n' "$value" >&2
+  printf '%s\n' 32
+}

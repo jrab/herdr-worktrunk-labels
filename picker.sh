@@ -66,6 +66,10 @@ fi
 [[ -z $name ]] && exit 0
 
 open_mode=$(worktrunk_open_mode)
+label=$(worktrunk_format_label \
+  "$name" \
+  "$(worktrunk_label_mode)" \
+  "$(worktrunk_label_max_length)")
 
 # Existing local or remote-tracking branch → switch (wt creates the worktree if
 # it doesn't exist yet, and checks out a remote ref like origin/foo directly).
@@ -98,7 +102,7 @@ if [[ $open_mode == tab ]]; then
     wtcmd="wt switch $quoted_name"
   fi
 
-  newpane=$("$herdr" tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$PWD" --label "$name" --focus \
+  newpane=$("$herdr" tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$PWD" --label "$label" --focus \
     | jq -r '.result.root_pane.pane_id')
   [[ -z $newpane ]] && { printf '\033[31m%s\033[0m\n' "failed to open worktree tab"; sleep 2; exit 1; }
 
@@ -141,4 +145,4 @@ root_ws=$("$herdr" worktree list --cwd "$PWD" --json 2>/dev/null \
 [[ -z $root_ws ]] && root_ws=$HERDR_WORKSPACE_ID
 
 exec "$herdr" worktree open --workspace "$root_ws" \
-  --path "$wtpath" --label "$name" --focus --json
+  --path "$wtpath" --label "$label" --focus --json

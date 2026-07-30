@@ -1,4 +1,42 @@
-# Worktrunk
+# Worktrunk Labels
+
+This fork extends the Worktrunk Herdr plugin with readable workspace labels
+derived from branch names while preserving the upstream worktree workflow.
+
+## Readable workspace labels
+
+The default `compact` mode keeps a leading issue key, converts slug separators
+to spaces, and truncates long labels at a word boundary:
+
+```text
+TASK-618/standardize-data-grids-and-migrate-to-new-table
+→ TASK-618 · standardize data…
+```
+
+Configure the behavior in the plugin's managed configuration directory:
+
+```bash
+config_dir=$(herdr plugin config-dir worktrunk-labels)
+mkdir -p "$config_dir"
+${EDITOR:-vi} "$config_dir/config.toml"
+```
+
+```toml
+# "compact" (default), "ticket", or "branch"
+label_mode = "compact"
+
+# Used by compact mode; accepted range is 12–120.
+label_max_length = 32
+```
+
+- `compact` produces a readable, bounded label.
+- `ticket` uses only a leading issue key such as `TASK-618`; branches without
+  an issue key fall back to the compact representation.
+- `branch` preserves the complete Git branch name, matching upstream behavior.
+
+These options affect only the Herdr workspace or tab label. Git branch names and
+worktree paths remain unchanged. Configuration is read every time the picker
+runs, so changes apply without reinstalling or reloading the plugin.
 
 A [herdr](https://herdr.dev) plugin for switching, creating, and removing git
 worktrees through [worktrunk](https://github.com/max-sixty/worktrunk). Pick (or
@@ -52,7 +90,7 @@ sidebar. To restore the original tab-based behavior, set `open_mode` to `"tab"`
 in the plugin's managed configuration directory:
 
 ```bash
-config_dir=$(herdr plugin config-dir worktrunk)
+config_dir=$(herdr plugin config-dir worktrunk-labels)
 mkdir -p "$config_dir"
 ${EDITOR:-vi} "$config_dir/config.toml"
 ```
@@ -96,41 +134,36 @@ Platforms: macOS and Linux.
 
 ## Installation
 
-From the herdr CLI:
+Clone the upstream plugin, apply the custom-label changes, then link the local
+checkout:
 
 ```bash
-herdr plugin install devashish2203/herdr-worktrunk
-```
-
-Or, for local development, clone and link:
-
-```bash
-git clone https://github.com/devashish2203/herdr-worktrunk
-herdr plugin link /path/to/herdr-worktrunk
+herdr plugin link /path/to/herdr-worktrunk-labels
 ```
 
 ## Usage
 
 ### Create/Switch a worktree from the default branch
 ```
-herdr plugin action invoke open --plugin worktrunk
+herdr plugin action invoke open --plugin worktrunk-labels
 ```
 
 ### Create/Switch a worktree from the current branch
 ```
-herdr plugin action invoke open-current --plugin worktrunk
+herdr plugin action invoke open-current --plugin worktrunk-labels
 ```
 
 ### Remove Worktree
 ```
-herdr plugin action invoke remove --plugin worktrunk
+herdr plugin action invoke remove --plugin worktrunk-labels
 ```
 
 ## Keybindings
 
 To drive the plugin from the keyboard, add `[[keys.command]]` entries to
 `~/.config/herdr/config.toml` with `type = "plugin_action"`. The `command` is the
-plugin's action id qualified with the plugin id (`worktrunk.<action>`; run
+plugin's action id qualified with the plugin id (`worktrunk-labels.<action>`;
+run
 `herdr plugin action list` to see the ids):
 
 ```toml
@@ -139,29 +172,30 @@ plugin's action id qualified with the plugin id (`worktrunk.<action>`; run
 [[keys.command]]
 key = "prefix+shift+g"
 type = "plugin_action"
-command = "worktrunk.open"
+command = "worktrunk-labels.open"
 description = "Worktree: switch / create from default branch"
 
 # Optional: bind current-branch creation separately.
 [[keys.command]]
 key = "prefix+shift+c"
 type = "plugin_action"
-command = "worktrunk.open-current"
+command = "worktrunk-labels.open-current"
 description = "Worktree: switch / create from current branch"
 
 [[keys.command]]
 key = "prefix+shift+d"
 type = "plugin_action"
-command = "worktrunk.remove"
+command = "worktrunk-labels.remove"
 description = "Worktree: remove"
 ```
 
 **Recommended:** override herdr's built-in worktree management with these. herdr
 binds `prefix+shift+g` to "new worktree" by default, and a custom keybinding takes
-precedence over the built-in on the same key — so mapping `worktrunk.open`
+precedence over the built-in on the same key — so mapping
+`worktrunk-labels.open`
 to `prefix+shift+g` replaces it with worktrunk's switch/create picker, hooks
-included. Pick matching keys for `worktrunk.open-current` and `worktrunk.remove`
-to round out the workflow.
+included. Pick matching keys for `worktrunk-labels.open-current` and
+`worktrunk-labels.remove` to round out the workflow.
 
 Reload the config after editing it:
 
@@ -185,7 +219,8 @@ herdr caches the manifest when a plugin is linked, so after editing
 `herdr-plugin.toml` you must relink for changes to take effect:
 
 ```bash
-herdr plugin unlink worktrunk && herdr plugin link "$PWD"
+herdr plugin unlink worktrunk-labels
+herdr plugin link "$PWD"
 ```
 
 Edits to the bash scripts are picked up on the next run — no relink needed.

@@ -53,4 +53,44 @@ assert_remote false
 printf 'show_remote_branches = maybe\n' > "$config_dir/config.toml"   # unsupported → default
 assert_remote false
 
+assert_label_mode() {
+  local expected=$1 actual
+  actual=$(worktrunk_label_mode 2>/dev/null)
+  if [[ $actual != "$expected" ]]; then
+    printf 'expected label mode %q, got %q\n' "$expected" "$actual" >&2
+    exit 1
+  fi
+}
+
+printf 'open_mode = "tab"\n' > "$config_dir/config.toml" # unrelated key → default
+assert_label_mode compact
+
+for mode in branch compact ticket; do
+  printf 'label_mode = "%s"\n' "$mode" > "$config_dir/config.toml"
+  assert_label_mode "$mode"
+done
+
+printf 'label_mode = "unsupported"\n' > "$config_dir/config.toml"
+assert_label_mode compact
+
+assert_label_length() {
+  local expected=$1 actual
+  actual=$(worktrunk_label_max_length 2>/dev/null)
+  if [[ $actual != "$expected" ]]; then
+    printf 'expected label length %q, got %q\n' "$expected" "$actual" >&2
+    exit 1
+  fi
+}
+
+printf 'open_mode = "tab"\n' > "$config_dir/config.toml" # unrelated key → default
+assert_label_length 32
+
+printf 'label_max_length = 40\n' > "$config_dir/config.toml"
+assert_label_length 40
+
+for invalid_length in 0 11 121 many; do
+  printf 'label_max_length = %s\n' "$invalid_length" > "$config_dir/config.toml"
+  assert_label_length 32
+done
+
 printf 'config tests passed\n'
