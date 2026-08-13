@@ -139,12 +139,12 @@ blocked for manual review. The setting defaults to `false`.
 ### Installing pnpm dependencies
 
 Set `auto_pnpm_install = true` to run `pnpm install` in a brand-new native
-worktree workspace when the checkout contains `pnpm-lock.yaml`. Installation
-runs once from the Worktrunk picker after Herdr creates the workspace but
-before Spreader opens its additional panes, so the panes do not launch
-competing installs. Reopening an existing workspace, tab mode, and repositories
-without a pnpm lockfile are unaffected. A failed install is reported but does
-not prevent the workspace layout from opening. The setting defaults to `false`.
+worktree workspace when the checkout contains `pnpm-lock.yaml`. Spreader opens
+the full layout first, then the picker queues the command only in the original
+root pane (pane 1). The other panes remain at their shell prompts and never
+launch competing installs. Reopening an existing workspace, tab mode, and
+repositories without a pnpm lockfile are unaffected. The setting defaults to
+`false`.
 
 ## Remote branches in the picker
 

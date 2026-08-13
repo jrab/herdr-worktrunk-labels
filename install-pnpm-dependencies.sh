@@ -16,10 +16,11 @@ already_open=$(jq -r '.result.already_open // false' <<<"$open_result")
 # from guessing the package manager for npm, Yarn, or Bun repositories.
 [[ -f $worktree/pnpm-lock.yaml ]] || exit 0
 
-if ! command -v pnpm >/dev/null 2>&1; then
-  printf '\033[33mWarning:\033[0m pnpm-lock.yaml exists, but pnpm is unavailable; skipping dependency install\n' >&2
-  exit 0
+root_pane_id=$(jq -r '.result.root_pane.pane_id // empty' <<<"$open_result")
+if [[ -z $root_pane_id ]]; then
+  printf 'worktree open returned no root pane for pnpm install\n' >&2
+  exit 1
 fi
 
-printf '\n\033[1mInstalling pnpm dependencies in %s\033[0m\n' "$worktree"
-(cd "$worktree" && pnpm install)
+herdr=${HERDR_BIN_PATH:-herdr}
+"$herdr" pane run "$root_pane_id" "pnpm install"
