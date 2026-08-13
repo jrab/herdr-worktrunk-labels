@@ -110,6 +110,21 @@ Supported values:
 The config file is read each time the picker runs, so changing the mode does
 not require reinstalling or reloading the plugin.
 
+### New-workspace layout
+
+Native worktree workspaces can opt into a layout supplied by the managed
+`herdr-spreader` fork:
+
+```toml
+workspace_layout = "herdr-spreader"
+```
+
+After `worktree open` creates a workspace, Worktrunk passes the returned
+workspace, first-tab, and root-pane IDs to Spreader. Spreader applies its
+single configured workspace to those existing objects instead of creating a
+duplicate workspace. Reopening an already-open worktree does not apply the
+layout again. The setting defaults to `"none"`.
+
 ## Remote branches in the picker
 
 By default the picker lists only your worktrees and local branches. To also

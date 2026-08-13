@@ -144,5 +144,17 @@ root_ws=$("$herdr" worktree list --cwd "$PWD" --json 2>/dev/null \
   | jq -r '.result.source.source_workspace_id // empty')
 [[ -z $root_ws ]] && root_ws=$HERDR_WORKSPACE_ID
 
-exec "$herdr" worktree open --workspace "$root_ws" \
-  --path "$wtpath" --label "$label" --focus --json
+if ! open_result=$("$herdr" worktree open --workspace "$root_ws" \
+  --path "$wtpath" --label "$label" --focus --json); then
+  printf '\033[31m%s\033[0m\n' "failed to open worktree workspace"
+  sleep 2
+  exit 1
+fi
+
+printf '%s\n' "$open_result"
+if ! "$plugin_root/apply-workspace-layout.sh" <<<"$open_result"; then
+  printf '\033[31m%s\033[0m\n' \
+    "worktree opened, but its configured workspace layout failed"
+  sleep 2
+  exit 1
+fi

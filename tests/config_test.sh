@@ -93,4 +93,22 @@ for invalid_length in 0 11 121 many; do
   assert_label_length 32
 done
 
+assert_workspace_layout() {
+  local expected=$1 actual
+  actual=$(worktrunk_workspace_layout 2>/dev/null)
+  if [[ $actual != "$expected" ]]; then
+    printf 'expected workspace layout %q, got %q\n' "$expected" "$actual" >&2
+    exit 1
+  fi
+}
+
+printf 'open_mode = "workspace"\n' > "$config_dir/config.toml"
+assert_workspace_layout none
+
+printf 'workspace_layout = "herdr-spreader"\n' > "$config_dir/config.toml"
+assert_workspace_layout herdr-spreader
+
+printf 'workspace_layout = "unsupported"\n' > "$config_dir/config.toml"
+assert_workspace_layout none
+
 printf 'config tests passed\n'

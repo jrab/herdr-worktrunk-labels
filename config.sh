@@ -61,6 +61,27 @@ worktrunk_open_mode() {
   esac
 }
 
+# Print the optional layout plugin applied after Herdr opens a brand-new native
+# worktree workspace. Existing workspaces and tab mode are never affected.
+worktrunk_workspace_layout() {
+  local plugin
+
+  plugin=$(worktrunk_config_value workspace_layout)
+
+  case "$plugin" in
+    ""|none)
+      printf '%s\n' none
+      ;;
+    herdr-spreader)
+      printf '%s\n' herdr-spreader
+      ;;
+    *)
+      printf '\033[33mWarning:\033[0m unsupported workspace_layout %q; using none\n' "$plugin" >&2
+      printf '%s\n' none
+      ;;
+  esac
+}
+
 # Print the workspace-label strategy. The customized plugin defaults to a
 # compact, human-readable label while retaining the upstream branch-name
 # behavior as an explicit option.
