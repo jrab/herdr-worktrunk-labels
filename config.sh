@@ -82,6 +82,27 @@ worktrunk_workspace_layout() {
   esac
 }
 
+# Print "true" when a new worktree may inherit direnv trust from the source
+# checkout for an identical .envrc file. Disabled by default.
+worktrunk_auto_direnv_allow() {
+  local value
+
+  value=$(worktrunk_config_value auto_direnv_allow)
+
+  case "$value" in
+    ""|false)
+      printf '%s\n' false
+      ;;
+    true)
+      printf '%s\n' true
+      ;;
+    *)
+      printf '\033[33mWarning:\033[0m unsupported auto_direnv_allow %q; using false\n' "$value" >&2
+      printf '%s\n' false
+      ;;
+  esac
+}
+
 # Print the workspace-label strategy. The customized plugin defaults to a
 # compact, human-readable label while retaining the upstream branch-name
 # behavior as an explicit option.

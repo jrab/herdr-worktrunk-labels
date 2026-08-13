@@ -125,6 +125,14 @@ single configured workspace to those existing objects instead of creating a
 duplicate workspace. Reopening an already-open worktree does not apply the
 layout again. The setting defaults to `"none"`.
 
+### Inheriting direnv trust
+
+Set `auto_direnv_allow = true` to let a new worktree inherit direnv trust from
+the source checkout. The plugin runs `direnv allow` only when both checkouts
+contain byte-identical root `.envrc` files and direnv reports that the source
+file is already allowed. A branch that adds or modifies `.envrc` remains
+blocked for manual review. The setting defaults to `false`.
+
 ## Remote branches in the picker
 
 By default the picker lists only your worktrees and local branches. To also

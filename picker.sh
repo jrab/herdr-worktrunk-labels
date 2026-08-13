@@ -144,6 +144,12 @@ root_ws=$("$herdr" worktree list --cwd "$PWD" --json 2>/dev/null \
   | jq -r '.result.source.source_workspace_id // empty')
 [[ -z $root_ws ]] && root_ws=$HERDR_WORKSPACE_ID
 
+source_checkout=$($herdr worktree list --cwd "$PWD" --json 2>/dev/null \
+  | jq -r '.result.source.source_checkout_path // empty')
+if [[ -n $source_checkout ]]; then
+  "$plugin_root/allow-direnv.sh" "$source_checkout" "$wtpath"
+fi
+
 if ! open_result=$("$herdr" worktree open --workspace "$root_ws" \
   --path "$wtpath" --label "$label" --focus --json); then
   printf '\033[31m%s\033[0m\n' "failed to open worktree workspace"

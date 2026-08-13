@@ -111,4 +111,22 @@ assert_workspace_layout herdr-spreader
 printf 'workspace_layout = "unsupported"\n' > "$config_dir/config.toml"
 assert_workspace_layout none
 
+assert_auto_direnv_allow() {
+  local expected=$1 actual
+  actual=$(worktrunk_auto_direnv_allow 2>/dev/null)
+  if [[ $actual != "$expected" ]]; then
+    printf 'expected auto direnv allow %q, got %q\n' "$expected" "$actual" >&2
+    exit 1
+  fi
+}
+
+printf 'open_mode = "workspace"\n' > "$config_dir/config.toml"
+assert_auto_direnv_allow false
+
+printf 'auto_direnv_allow = true\n' > "$config_dir/config.toml"
+assert_auto_direnv_allow true
+
+printf 'auto_direnv_allow = "unsupported"\n' > "$config_dir/config.toml"
+assert_auto_direnv_allow false
+
 printf 'config tests passed\n'
