@@ -158,6 +158,10 @@ if ! open_result=$("$herdr" worktree open --workspace "$root_ws" \
 fi
 
 printf '%s\n' "$open_result"
+if ! "$plugin_root/install-pnpm-dependencies.sh" "$wtpath" <<<"$open_result"; then
+  printf '\033[33m%s\033[0m\n' \
+    "worktree opened, but pnpm dependency installation failed; continuing with the workspace layout"
+fi
 if ! "$plugin_root/apply-workspace-layout.sh" <<<"$open_result"; then
   printf '\033[31m%s\033[0m\n' \
     "worktree opened, but its configured workspace layout failed"

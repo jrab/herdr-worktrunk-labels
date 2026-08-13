@@ -136,6 +136,16 @@ contain byte-identical root `.envrc` files and direnv reports that the source
 file is already allowed. A branch that adds or modifies `.envrc` remains
 blocked for manual review. The setting defaults to `false`.
 
+### Installing pnpm dependencies
+
+Set `auto_pnpm_install = true` to run `pnpm install` in a brand-new native
+worktree workspace when the checkout contains `pnpm-lock.yaml`. Installation
+runs once from the Worktrunk picker after Herdr creates the workspace but
+before Spreader opens its additional panes, so the panes do not launch
+competing installs. Reopening an existing workspace, tab mode, and repositories
+without a pnpm lockfile are unaffected. A failed install is reported but does
+not prevent the workspace layout from opening. The setting defaults to `false`.
+
 ## Remote branches in the picker
 
 By default the picker lists only your worktrees and local branches. To also

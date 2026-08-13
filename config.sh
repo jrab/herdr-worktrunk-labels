@@ -103,6 +103,29 @@ worktrunk_auto_direnv_allow() {
   esac
 }
 
+# Print "true" when pnpm dependencies should be installed before a brand-new
+# native worktree workspace receives its configured layout. Disabled by default.
+worktrunk_auto_pnpm_install() {
+  local value
+
+  value=$(worktrunk_config_value auto_pnpm_install)
+
+  case "$value" in
+    ""|false)
+      printf '%s\n' false
+      ;;
+    true)
+      printf '%s\n' true
+      ;;
+    *)
+      printf \
+        '\033[33mWarning:\033[0m unsupported auto_pnpm_install %q; using false\n' \
+        "$value" >&2
+      printf '%s\n' false
+      ;;
+  esac
+}
+
 # Print the workspace-label strategy. The customized plugin defaults to a
 # compact, human-readable label while retaining the upstream branch-name
 # behavior as an explicit option.

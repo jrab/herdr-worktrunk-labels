@@ -129,4 +129,22 @@ assert_auto_direnv_allow true
 printf 'auto_direnv_allow = "unsupported"\n' > "$config_dir/config.toml"
 assert_auto_direnv_allow false
 
+assert_auto_pnpm_install() {
+  local expected=$1 actual
+  actual=$(worktrunk_auto_pnpm_install 2>/dev/null)
+  if [[ $actual != "$expected" ]]; then
+    printf 'expected auto pnpm install %q, got %q\n' "$expected" "$actual" >&2
+    exit 1
+  fi
+}
+
+printf 'open_mode = "workspace"\n' > "$config_dir/config.toml"
+assert_auto_pnpm_install false
+
+printf 'auto_pnpm_install = true\n' > "$config_dir/config.toml"
+assert_auto_pnpm_install true
+
+printf 'auto_pnpm_install = "unsupported"\n' > "$config_dir/config.toml"
+assert_auto_pnpm_install false
+
 printf 'config tests passed\n'
