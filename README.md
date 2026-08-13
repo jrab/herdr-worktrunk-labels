@@ -120,7 +120,10 @@ workspace_layout = "herdr-spreader"
 ```
 
 After `worktree open` creates a workspace, Worktrunk passes the returned
-workspace, first-tab, and root-pane IDs to Spreader. Spreader applies its
+workspace, first-tab, root-pane IDs, and authoritative checkout path to
+Spreader. Passing the checkout path prevents shell startup hooks from
+temporarily redirecting new split panes into a directory such as
+`~/.oh-my-zsh`. Spreader applies its
 single configured workspace to those existing objects instead of creating a
 duplicate workspace. Reopening an already-open worktree does not apply the
 layout again. The setting defaults to `"none"`.

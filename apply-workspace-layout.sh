@@ -15,8 +15,15 @@ already_open=$(jq -r '.result.already_open // false' <<<"$open_result")
 workspace_id=$(jq -r '.result.workspace.workspace_id // empty' <<<"$open_result")
 tab_id=$(jq -r '.result.tab.tab_id // empty' <<<"$open_result")
 root_pane_id=$(jq -r '.result.root_pane.pane_id // empty' <<<"$open_result")
-if [[ -z $workspace_id || -z $tab_id || -z $root_pane_id ]]; then
-  printf 'worktree open returned no target workspace, tab, or root pane\n' >&2
+worktree_path=$(jq -r \
+  '.result.workspace.worktree.checkout_path // .result.worktree.path // empty' \
+  <<<"$open_result")
+if [[ -z $workspace_id || -z $tab_id || -z $root_pane_id || -z $worktree_path ]]; then
+  printf 'worktree open returned no target workspace, tab, root pane, or checkout path\n' >&2
+  exit 1
+fi
+if [[ $worktree_path != /* ]]; then
+  printf 'worktree open returned a non-absolute checkout path: %s\n' "$worktree_path" >&2
   exit 1
 fi
 
@@ -35,4 +42,5 @@ HERDR_BIN_PATH=$herdr \
   "$layout_binary" apply-existing \
     --workspace-id "$workspace_id" \
     --tab-id "$tab_id" \
-    --root-pane-id "$root_pane_id"
+    --root-pane-id "$root_pane_id" \
+    --root "$worktree_path"
