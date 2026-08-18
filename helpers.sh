@@ -90,3 +90,25 @@ worktrunk_format_label() {
 
   printf '%s\n' "$label"
 }
+
+# Emit one worktrunk list item per line with the schema 1 location fields
+# (`kind`, `path`, and `is_main`) available at the top level. Worktrunk's JSON
+# schema 2 wraps items in an envelope and nests those fields under `worktree`.
+worktrunk_list_items() {
+  jq -c '
+    def normalize:
+      . + {
+        kind: (.kind // (if (.worktree | type) == "object" then "worktree" else "branch" end)),
+        path: (.path // .worktree.path // null),
+        is_main: (.is_main // .worktree.main // false)
+      };
+
+    if type == "array" then
+      .[] | normalize
+    elif type == "object" and ((.items | type) == "array") then
+      .items[] | normalize
+    else
+      error("unsupported worktrunk list JSON schema")
+    end
+  '
+}
